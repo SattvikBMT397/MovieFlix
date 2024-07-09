@@ -1,21 +1,24 @@
-import { ChangeEvent, useState } from 'react';
-import { useDispatch} from 'react-redux';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 import { registerUser } from '../features/user/userSlice';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { AppDispatch } from '../app/store';
+import { IFormInput } from '../utils/Interfaces';
 
-function Register() {
+const Register: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  // const Selector =useSelector((state)=>state);
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  
+  const { control, handleSubmit, formState: { errors } } = useForm<IFormInput>({
+    defaultValues: {
+      username: '',
+      password: ''
+    }
+  });
 
-  const handleRegister = (e: ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const userData = { username, password };
-
+  const onSubmit: SubmitHandler<IFormInput> = (userData) => {
     dispatch(registerUser(userData));
     navigate('/login');
   };
@@ -26,23 +29,39 @@ function Register() {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Register
         </Typography>
-        <form onSubmit={handleRegister}>
-          <TextField
-            label="Username"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name="username"
+            control={control}
+            rules={{ required: 'Username is required' }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Username"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                error={!!errors.username}
+                helperText={errors.username ? errors.username.message : ''}
+              />
+            )}
           />
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+          <Controller
+            name="password"
+            control={control}
+            rules={{ required: 'Password is required' }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                error={!!errors.password}
+                helperText={errors.password ? errors.password.message : ''}
+              />
+            )}
           />
           <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }}>
             Register

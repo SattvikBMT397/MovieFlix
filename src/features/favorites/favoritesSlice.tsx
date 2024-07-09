@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import localForage from 'localforage';
 import { FavoritesState, Movie} from '../../utils/Interfaces';
-import { RootState } from '../../app/store';
+import { AppDispatch, RootState } from '../../app/store';
 
 const initialState: FavoritesState = {
   favorites: [],
@@ -32,7 +32,7 @@ export const saveFavoritesToLocalForage = (username: string, favorites: Movie[])
   await localForage.setItem(`favorites_${username}`, favorites);
 };
 
-export const loadFavoritesFromLocalForage = (username:String) => async (dispatch:any) => {
+export const loadFavoritesFromLocalForage = (username:String) => async (dispatch:AppDispatch) => {
   const favorites = await localForage.getItem<Movie[]>(`favorites_${username}`);
   if (favorites) {
     dispatch(setFavorites(favorites));

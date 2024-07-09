@@ -34,6 +34,22 @@ const Details: React.FC = () => {
   const [newComment, setNewComment] = useState<string>('');
   const [newRating, setNewRating] = useState<string>('');
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get<Movie[]>('https://376689ee81334657b291d79dcf252ffe.api.mockbin.io/');
+  //       setData(response.data);
+  //    setloading(false);
+  //     } catch (error) {
+  //       setError('Failed to fetch data');
+  //       setloading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+
   useEffect(() => {
     const fetchComments = async () => {
       const storedComments = (await localforage.getItem<Comment[]>('comments')) || [];

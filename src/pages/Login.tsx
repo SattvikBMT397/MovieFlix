@@ -1,17 +1,28 @@
-import React, { useEffect, useState, FormEvent } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { authenticateUser } from '../features/user/userSlice';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
-import { RootState } from '../app/store';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { AppDispatch, RootState } from '../app/store';
+
+interface IFormInput {
+  username: string;
+  password: string;
+}
 
 const Login: React.FC = () => {
-  const dispatch = useDispatch<any>();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  
-  const data = useSelector((state: RootState) => state.user); 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+
+  const { control, handleSubmit, formState: { errors } } = useForm<IFormInput>({
+    defaultValues: {
+      username: '',
+      password: ''
+    }
+  });
+
+  const data = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     if (data?.currentUser !== null) {
@@ -19,13 +30,11 @@ const Login: React.FC = () => {
     }
   }, [data?.currentUser, navigate]);
 
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const userData = { username, password };
+  const onSubmit: SubmitHandler<IFormInput> = (userData) => {
     try {
       dispatch(authenticateUser(userData));
     } catch (error) {
-      // console.log(error.message); 
+      // console.log(error.message);
     }
   };
 
@@ -39,23 +48,39 @@ const Login: React.FC = () => {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Login
         </Typography>
-        <form onSubmit={handleLogin}>
-          <TextField
-            label="Username"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name="username"
+            control={control}
+            rules={{ required: 'Username is required' }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Username"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                error={!!errors.username}
+                helperText={errors.username ? errors.username.message : ''}
+              />
+            )}
           />
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+          <Controller
+            name="password"
+            control={control}
+            rules={{ required: 'Password is required' }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                error={!!errors.password}
+                helperText={errors.password ? errors.password.message : ''}
+              />
+            )}
           />
           <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }}>
             Login

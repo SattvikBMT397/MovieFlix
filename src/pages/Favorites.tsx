@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Typography, Grid, Card, CardMedia, CardContent, Button } from '@mui/material';
 import { removeFavorite, setFavorites, saveFavoritesToLocalForage } from '../features/favorites/favoritesSlice';
 import localforage from 'localforage';
+import { RootState } from '../app/store';
+import { Movie } from '../utils/Interfaces';
 
 
 function Favorites() {
-  const favorites = useSelector(state => state.favorites.favorites);
-  const currentUser = useSelector(state => state.user.currentUser);
+  const favorites = useSelector((state:RootState) => state.favorites.favorites);
+  const currentUser = useSelector((state:RootState) => state.user.currentUser);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -24,7 +26,7 @@ function Favorites() {
     fetchFavorites();
   }, [currentUser, dispatch]);
 
-  const handleRemoveFavorite = (movie) => {
+  const handleRemoveFavorite = (movie:Movie) => {
     const updatedFavorites = favorites.filter(fav => fav.imdbID !== movie.imdbID);
     dispatch(removeFavorite(movie));
     if (currentUser) {
