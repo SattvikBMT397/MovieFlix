@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Typography, Grid, Card, CardMedia, CardContent, Button } from '@mui/material';
-import { removeFavorite, setFavorites, saveFavoritesToLocalForage } from '../features/favorites/favoritesSlice';
+import { removeFavorite, setFavorites} from '../features/favorites/favoritesSlice';
 import localforage from 'localforage';
 import { RootState } from '../app/store';
 import { Movie } from '../utils/Interfaces';
@@ -14,7 +14,6 @@ function Favorites() {
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      // console.log(currentUser);
       if (currentUser) {
         const data = await localforage.getItem(`favorites_${currentUser.username}`);
         console.log(data);  
@@ -26,11 +25,12 @@ function Favorites() {
     fetchFavorites();
   }, [currentUser, dispatch]);
 
-  const handleRemoveFavorite = (movie:Movie) => {
+  const handleRemoveFavorite = async(movie:Movie) => {
     const updatedFavorites = favorites.filter(fav => fav.imdbID !== movie.imdbID);
     dispatch(removeFavorite(movie));
     if (currentUser) {
-      dispatch(saveFavoritesToLocalForage(currentUser.username, updatedFavorites));
+    await localforage.setItem(`favorites_${currentUser.username}`, updatedFavorites);
+    dispatch(setFavorites(updatedFavorites));
     }
   };
 

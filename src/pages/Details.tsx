@@ -76,7 +76,7 @@ const Details: React.FC = () => {
 
   return (
     <div style={{ backgroundColor: '#f0f0f0', minHeight: '100vh' }}>
-      <AppBar position="static" style={{ backgroundColor: 'black' }}>
+      <AppBar position="static" style={{ backgroundColor: 'white' }}>
         <Toolbar>
           <Typography variant="h6" style={{ fontSize: '35px', color: 'red', fontWeight: 'bold', textAlign: 'center', margin: '2rem 0' }}>
             MovieX

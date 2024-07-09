@@ -5,7 +5,6 @@ import { authenticateUser } from '../features/user/userSlice';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { AppDispatch, RootState } from '../app/store';
-
 interface IFormInput {
   username: string;
   password: string;
@@ -31,11 +30,8 @@ const Login: React.FC = () => {
   }, [data?.currentUser, navigate]);
 
   const onSubmit: SubmitHandler<IFormInput> = (userData) => {
-    try {
+  
       dispatch(authenticateUser(userData));
-    } catch (error) {
-      // console.log(error.message);
-    }
   };
 
   const handleRegisterNavigation = () => {
@@ -68,7 +64,10 @@ const Login: React.FC = () => {
           <Controller
             name="password"
             control={control}
-            rules={{ required: 'Password is required' }}
+            rules={{
+              required: 'Password is required',
+              minLength: { value: 6, message: 'Password must be at least 6 characters' },
+            }}
             render={({ field }) => (
               <TextField
                 {...field}

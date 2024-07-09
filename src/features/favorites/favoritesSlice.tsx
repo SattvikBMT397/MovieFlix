@@ -28,8 +28,9 @@ export const favoritesSlice = createSlice({
 
 export const { addFavorite, removeFavorite, clearFavorites, setFavorites } = favoritesSlice.actions;
 
-export const saveFavoritesToLocalForage = (username: string, favorites: Movie[]) => async () => {
+export const saveFavoritesToLocalForage = (username: string, favorites: Movie[]) => async (dispatch:AppDispatch) => {
   await localForage.setItem(`favorites_${username}`, favorites);
+  dispatch(setFavorites(favorites));
 };
 
 export const loadFavoritesFromLocalForage = (username:String) => async (dispatch:AppDispatch) => {

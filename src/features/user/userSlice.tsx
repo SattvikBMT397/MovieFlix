@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import localForage from 'localforage';
 import { loadFavoritesFromLocalForage } from '../favorites/favoritesSlice';
 import {User} from "../../utils/Interfaces"
-import { RootState } from '../../app/store';
+import { AppDispatch, RootState } from '../../app/store';
 
 const initialState = {
     currentUser: JSON.parse(localStorage.getItem('currentUser')!)
@@ -29,7 +29,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const registerUser = (userData:User) => async (dispatch:any) => {
+export const registerUser = (userData:User) => async (dispatch:AppDispatch) => {
   const registeredUsers:User[] = (await localForage.getItem("RegisteredUsers")) || [];
   registeredUsers.push(userData);
   await localForage.setItem("RegisteredUsers", registeredUsers);
@@ -43,7 +43,7 @@ export const authenticateUser = (data:User) => async (dispatch:any) => {
     dispatch(userSlice.actions.login(user));
     dispatch(loadFavoritesFromLocalForage(user.username));
   } else {
-    alert("Invalid Credentials");
+    alert("Invalid Credentials"); 
   }
 };
 
