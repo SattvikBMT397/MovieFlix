@@ -10,7 +10,7 @@ import { IFormInput } from '../utils/Interfaces';
 const Register: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  
+
   const { control, handleSubmit, formState: { errors } } = useForm<IFormInput>({
     defaultValues: {
       username: '',
@@ -33,7 +33,11 @@ const Register: React.FC = () => {
           <Controller
             name="username"
             control={control}
-            rules={{ required: 'Username is required' }}
+            rules={{
+              required: 'Username is required',
+              minLength: { value: 4, message: 'Username must be at least 4 characters long' },
+              pattern: { value: /^[a-zA-Z0-9_]+$/, message: 'Username can only contain letters, numbers, and underscores' }
+            }}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -49,7 +53,11 @@ const Register: React.FC = () => {
           <Controller
             name="password"
             control={control}
-            rules={{ required: 'Password is required' }}
+            rules={{
+              required: 'Password is required',
+              minLength: { value: 6, message: 'Password must be at least 6 characters long' },
+              pattern: { value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/, message: 'Password must contain at least one letter and one number' }
+            }}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -67,6 +75,7 @@ const Register: React.FC = () => {
             Register
           </Button>
         </form>
+        <Button variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }} onClick={() => { navigate("/login") }}>Login</Button>
       </Box>
     </Container>
   );

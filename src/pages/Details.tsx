@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import localforage from 'localforage';
 import api from '../utils/api.json';
 import {
@@ -21,34 +21,17 @@ import {
   Box,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
-import {RootState} from '../app/store';
-import { Comment ,Movie} from '../utils/Interfaces'
-
-
+import { RootState } from '../app/store';
+import { Comment, Movie } from '../utils/Interfaces';
 
 const Details: React.FC = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const movie = api.find((movie: Movie) => movie.imdbID === id);
   const user = useSelector((state: RootState) => state.user.currentUser?.username) || 'Anonymous';
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
   const [newRating, setNewRating] = useState<string>('');
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get<Movie[]>('https://376689ee81334657b291d79dcf252ffe.api.mockbin.io/');
-  //       setData(response.data);
-  //    setloading(false);
-  //     } catch (error) {
-  //       setError('Failed to fetch data');
-  //       setloading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -77,9 +60,20 @@ const Details: React.FC = () => {
   return (
     <div style={{ backgroundColor: '#f0f0f0', minHeight: '100vh' }}>
       <AppBar position="static" style={{ backgroundColor: 'white' }}>
-        <Toolbar>
-          <Typography variant="h6" style={{ fontSize: '35px', color: 'red', fontWeight: 'bold', textAlign: 'center', margin: '2rem 0' }}>
-            MovieX
+        <Toolbar style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography
+            variant="h6"
+            style={{
+              fontSize: '35px',
+              fontFamily: "cursive",
+              color: 'red',
+              fontWeight: 'bold',
+            }}
+            onClick={() => {
+              navigate("/");
+            }}
+          >
+            MovieFlix
           </Typography>
         </Toolbar>
       </AppBar>
@@ -96,7 +90,7 @@ const Details: React.FC = () => {
                 sx={{
                   width: '100%',
                   maxHeight: 700,
-                  objectFit: 'cover',
+                  objectFit: 'contain',
                   borderTopLeftRadius: '10px',
                   borderTopRightRadius: '10px',
                 }}

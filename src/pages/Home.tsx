@@ -55,7 +55,7 @@ const Home: React.FC = () => {
           <Typography variant="h6" style={{
             fontSize: '35px',
             fontFamily: "cursive",
-            color: 'black',
+            color: 'red',
             fontWeight: 'bold',
           }}>
             MovieFlix
@@ -116,7 +116,7 @@ const Home: React.FC = () => {
                         title={movie.Title}
                         sx={{
                           width: '100%',
-                          objectFit: 'cover',
+                          objectFit: 'contain',
                           borderTopLeftRadius: '10px',
                           borderTopRightRadius: '10px',
                           minWidth: '250px'
