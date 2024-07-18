@@ -1,11 +1,14 @@
 import React, { useState, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api.json';
-import { AppBar, Toolbar, Typography, Container, Card, CardMedia, CardContent, Grid, Box, Button, TextField } from '@mui/material';
+import { AppBar, Toolbar, Typography, Container, Card, CardMedia, CardContent, Grid, Box, Button, TextField, IconButton, Hidden } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/user/userSlice';
 import { addFavorite, removeFavorite, saveFavoritesToLocalForage, selectFavorites } from '../features/favorites/favoritesSlice';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { RootState, AppDispatch } from '../app/store';
 import { Movie } from '../utils/Interfaces';
 
@@ -52,47 +55,72 @@ const Home: React.FC = () => {
     <Container style={{ minHeight: '100vh' }}>
       <AppBar position="static" style={{ backgroundColor: 'white' }}>
         <Toolbar style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" style={{
-            fontSize: '35px',
+          <Typography variant="h6" sx={{
+            fontSize: { xs: '25px', sm: '30px', md: '35px' },
             fontFamily: "cursive",
             color: 'red',
             fontWeight: 'bold',
+            margin: { xs: '10px 0', md: '0' }
           }}>
             MovieFlix
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
             <TextField
               label="Search Movies"
               variant="outlined"
               value={searchQuery}
               onChange={handleSearch}
-              style={{ marginRight: '10px' }}
+              sx={{ width: { xs: '100%', sm: 'auto' }, marginRight: '10px' }}
             />
             {Validation ? (
-              <Button variant="contained" style={{
-                backgroundColor: '#ff9800',
-                color: 'black',
-                fontWeight: 'bold',
-              }} onClick={() => dispatch(logout())}>
-                Logout
-              </Button>
+              <>
+                <Hidden smDown>
+                  <Button variant="contained" sx={{
+                    backgroundColor: '#ff9800',
+                    color: 'black',
+                    fontWeight: 'bold',
+                    width: { xs: '100%', sm: 'auto' },
+                  }} onClick={() => dispatch(logout())}>
+                    Logout
+                  </Button>
+                </Hidden>
+                <Hidden smUp>
+                  <IconButton onClick={() => dispatch(logout())} color="inherit">
+                    <LogoutIcon />
+                  </IconButton>
+                </Hidden>
+              </>
             ) : (
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <Button variant="contained" style={{
-                  backgroundColor: '#ff9800',
-                  color: 'black',
-                  fontWeight: 'bold',
-                }} onClick={() => navigate('/login')}>
-                  Login
-                </Button>
-                <Button variant="contained" style={{
-                  backgroundColor: '#ff9800',
-                  color: 'black',
-                  fontWeight: 'bold',
-                }} onClick={() => navigate('/register')}>
-                  Register
-                </Button>
-              </Box>
+              <>
+                <Hidden smDown>
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Button variant="contained" sx={{
+                      backgroundColor: '#ff9800',
+                      color: 'black',
+                      fontWeight: 'bold',
+                      width: { xs: '100%', sm: 'auto' },
+                    }} onClick={() => navigate('/login')}>
+                      Login
+                    </Button>
+                    <Button variant="contained" sx={{
+                      backgroundColor: '#ff9800',
+                      color: 'black',
+                      fontWeight: 'bold',
+                      width: { xs: '100%', sm: 'auto' },
+                    }} onClick={() => navigate('/register')}>
+                      Register
+                    </Button>
+                  </Box>
+                </Hidden>
+                <Hidden smUp>
+                  <IconButton onClick={() => navigate('/login')} color="inherit">
+                    <LoginIcon />
+                  </IconButton>
+                  <IconButton onClick={() => navigate('/register')} color="inherit">
+                    <PersonAddIcon />
+                  </IconButton>
+                </Hidden>
+              </>
             )}
             <Button variant="text" onClick={() => navigate('/favorites')}>
               <FavoriteIcon fontSize='large' />
@@ -125,9 +153,10 @@ const Home: React.FC = () => {
                     </Grid>
                     <Grid item xs={12} md={8}>
                       <CardContent>
-                        <Typography variant="h5" component="div" style={{
+                        <Typography variant="h5" component="div" sx={{
                           fontWeight: 'bold',
-                          color: 'red'
+                          color: 'red',
+                          fontSize: { xs: '18px', sm: '24px', md: '28px' }
                         }}>
                           {movie.Title}
                         </Typography>
@@ -154,12 +183,12 @@ const Home: React.FC = () => {
                           </Typography>
                         </Box>
                         {!favorites.some(favorite => favorite.imdbID === movie.imdbID) ? (
-                          <Button variant="contained" style={{ marginTop: '20px', backgroundColor: 'brown' }} onClick={(e) => {
+                          <Button variant="contained" sx={{ marginTop: '20px', backgroundColor: 'brown' }} onClick={(e) => {
                             e.stopPropagation();
                             handleAddFavorite(movie);
                           }}>Add to Favorite</Button>
                         ) : (
-                          <Button variant="contained" style={{ marginTop: '20px', backgroundColor: 'brown' }} onClick={(e) => {
+                          <Button variant="contained" sx={{ marginTop: '20px', backgroundColor: 'brown' }} onClick={(e) => {
                             e.stopPropagation();
                             handleRemoveFavorite(movie);
                           }}>Remove from Favorite</Button>

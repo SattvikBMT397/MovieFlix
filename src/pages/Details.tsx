@@ -65,12 +65,12 @@ const Details: React.FC = () => {
             variant="h6"
             style={{
               fontSize: '35px',
-              fontFamily: "cursive",
+              fontFamily: 'cursive',
               color: 'red',
               fontWeight: 'bold',
             }}
             onClick={() => {
-              navigate("/");
+              navigate('/');
             }}
           >
             MovieFlix
@@ -84,7 +84,7 @@ const Details: React.FC = () => {
               <CardMedia
                 component="img"
                 alt={movie?.Title}
-                height="400"
+                height="auto"
                 image={movie?.Poster}
                 title={movie?.Title}
                 sx={{
