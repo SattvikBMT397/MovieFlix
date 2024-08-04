@@ -1,9 +1,11 @@
 
   export interface Comment {
-    username: string;
+   
+    userId: number;
+ username: string;
     comment: string;
-    rating: string;
-    movieId: string | undefined;
+    rating: number;
+    imdbID: string ;
   }
   
   export interface Movie {
@@ -34,7 +36,7 @@
   }
 
   export interface User {
-    username: string;
+    email: string;
     password: string;
   }
   
@@ -49,8 +51,8 @@
     Movie:String
   }
   
-  
 export interface IFormInput {
   username: string;
+  email: string;
   password: string;
 }

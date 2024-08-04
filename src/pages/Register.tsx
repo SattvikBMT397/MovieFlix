@@ -10,17 +10,21 @@ import { IFormInput } from '../utils/Interfaces';
 const Register: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-
   const { control, handleSubmit, formState: { errors } } = useForm<IFormInput>({
     defaultValues: {
       username: '',
+      email: '',
       password: ''
     }
   });
 
-  const onSubmit: SubmitHandler<IFormInput> = (userData) => {
-    dispatch(registerUser(userData));
-    navigate('/login');
+  const onSubmit: SubmitHandler<IFormInput> = async (userData) => {
+    const resultAction = await dispatch(registerUser(userData));
+    if (registerUser.fulfilled.match(resultAction)) {
+      navigate('/login');
+    } else {
+      console.error(resultAction.payload);
+    }
   };
 
   return (
@@ -35,8 +39,7 @@ const Register: React.FC = () => {
             control={control}
             rules={{
               required: 'Username is required',
-              minLength: { value: 4, message: 'Username must be at least 4 characters long' },
-              pattern: { value: /^[a-zA-Z0-9_]+$/, message: 'Username can only contain letters, numbers, and underscores' }
+              minLength: { value: 3, message: 'Username must be at least 3 characters long' }
             }}
             render={({ field }) => (
               <TextField
@@ -47,6 +50,28 @@ const Register: React.FC = () => {
                 margin="normal"
                 error={!!errors.username}
                 helperText={errors.username ? errors.username.message : ''}
+              />
+            )}
+          />
+          <Controller
+            name="email"
+            control={control}
+            rules={{
+              required: 'Email is required',
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                message: 'Invalid email address'
+              }
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Email"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                error={!!errors.email}
+                helperText={errors.email ? errors.email.message : ''}
               />
             )}
           />
@@ -75,7 +100,9 @@ const Register: React.FC = () => {
             Register
           </Button>
         </form>
-        <Button variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }} onClick={() => { navigate("/login") }}>Login</Button>
+        <Button variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }} onClick={() => navigate('/login')}>
+          Login
+        </Button>
       </Box>
     </Container>
   );

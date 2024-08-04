@@ -1,7 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import localforage from 'localforage';
-import api from '../utils/api.json';
+import axiosInstance from '../utils/axiosInstance';
 import {
   AppBar,
   Toolbar,
@@ -20,42 +19,54 @@ import {
   Divider,
   Box,
 } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { RootState } from '../app/store';
+// import { useSelector } from 'react-redux';
+// import { RootState } from '../app/store';
 import { Comment, Movie } from '../utils/Interfaces';
+import api from '../utils/api.json';
 
 const Details: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const movie = api.find((movie: Movie) => movie.imdbID === id);
-  const user = useSelector((state: RootState) => state.user.currentUser?.username) || 'Anonymous';
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
-  const [newRating, setNewRating] = useState<string>('');
+  const [newRating, setNewRating] = useState<number | ''>('');
+  const userId = Number(localStorage.getItem('Id')); 
 
   useEffect(() => {
     const fetchComments = async () => {
-      const storedComments = (await localforage.getItem<Comment[]>('comments')) || [];
-      setComments(storedComments);
+      try {
+        const response = await axiosInstance.get(`/comment/${id}`);
+        // console.log(response.data, 'response');
+        setComments(response.data.data); 
+      } catch (error) {
+        console.error('Failed to fetch comments:', error);
+      }
     };
     fetchComments();
-  }, [user]);
+  }, [id]);
 
   const handleCommentChange = (e: ChangeEvent<HTMLInputElement>) => setNewComment(e.target.value);
-  const handleRatingChange = (e: ChangeEvent<HTMLInputElement>) => setNewRating(e.target.value);
+  const handleRatingChange = (e: ChangeEvent<HTMLInputElement>) => setNewRating(Number(e.target.value));
 
   const handleCommentSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (newComment && newRating) {
-      const newComments = [...comments, { username: user, comment: newComment, rating: newRating, movieId: id }];
-      setComments(newComments);
-      setNewComment('');
-      setNewRating('');
-      await localforage.setItem('comments', newComments);
+    if (newComment && newRating !== '') {
+      const commentData = { userId, comment: newComment, rating: newRating, imdbID: id as string };
+      try {
+        await axiosInstance.post('/comment/add', commentData);
+        setNewComment('');
+        setNewRating('');
+        // Re-fetch comments to get the latest list including the new comment with username
+        const response = await axiosInstance.get(`/comment/${id}`);
+        setComments(response.data.data);
+      } catch (error) {
+        console.error('Failed to add comment:', error);
+      }
     }
   };
 
-  const movieComments = comments.filter(comment => comment.movieId === id);
+  const movieComments = comments.filter(comment => comment.imdbID === id);
 
   return (
     <div style={{ backgroundColor: '#f0f0f0', minHeight: '100vh' }}>
@@ -140,7 +151,7 @@ const Details: React.FC = () => {
                 value={newRating}
                 onChange={handleRatingChange}
                 type="number"
-                inputProps={{ min: 1, max: 10 }}
+                inputProps={{ min: 0, max: 10 }}
                 required
               />
               <TextField

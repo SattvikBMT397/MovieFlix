@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { login } from '../features/user/userSlice';
+import { authenticateUser } from '../features/user/userSlice';
+
 
 const Root: React.FC = () => {
   const dispatch = useDispatch();
@@ -9,7 +10,7 @@ const Root: React.FC = () => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      dispatch(login(parsedUser));
+     authenticateUser(parsedUser);
     }
   }, [dispatch]);
 
