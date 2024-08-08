@@ -5,9 +5,8 @@ import { authenticateUser } from '../features/user/userSlice';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { AppDispatch, RootState } from '../app/store';
-
 interface IFormInput {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -17,7 +16,7 @@ const Login: React.FC = () => {
 
   const { control, handleSubmit, formState: { errors } } = useForm<IFormInput>({
     defaultValues: {
-      email: '',
+      username: '',
       password: ''
     }
   });
@@ -31,7 +30,8 @@ const Login: React.FC = () => {
   }, [data?.currentUser, navigate]);
 
   const onSubmit: SubmitHandler<IFormInput> = (userData) => {
-    dispatch(authenticateUser(userData));
+  
+      dispatch(authenticateUser(userData));
   };
 
   const handleRegisterNavigation = () => {
@@ -46,18 +46,18 @@ const Login: React.FC = () => {
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Controller
-            name="email"
+            name="username"
             control={control}
-            rules={{ required: 'Email is required' }}
+            rules={{ required: 'Username is required' }}
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Email"
+                label="Username"
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                error={!!errors.email}
-                helperText={errors.email ? errors.email.message : ''}
+                error={!!errors.username}
+                helperText={errors.username ? errors.username.message : ''}
               />
             )}
           />

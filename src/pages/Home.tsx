@@ -4,7 +4,7 @@ import api from '../utils/api.json';
 import { AppBar, Toolbar, Typography, Container, Card, CardMedia, CardContent, Grid, Box, Button, TextField, IconButton, Hidden } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/user/userSlice';
-import { addFavorite, removeFavorite} from '../features/favorites/favoritesSlice';
+import { addFavorite, removeFavorite, saveFavoritesToLocalForage, selectFavorites } from '../features/favorites/favoritesSlice';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -18,14 +18,12 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const Validation = useSelector((state: RootState) => state.user.currentUser);
-  // const favorites = useSelector(selectFavorites);
-  const favorites = useSelector((state: RootState) => state.favorites.favorites);
-  console.log("favorites",favorites);
+  const favorites = useSelector(selectFavorites);
 
   const handleCardClick = (id: string) => {
     if (Validation) {
       navigate(`/details/${id}`);
-    } else {  
+    } else {
       alert("Please Login");
     }
   };
@@ -37,6 +35,7 @@ const Home: React.FC = () => {
   const handleAddFavorite = (movie: Movie) => {
     if (Validation) {
       dispatch(addFavorite(movie));
+      dispatch(saveFavoritesToLocalForage(Validation.username, [...favorites, movie]));
     } else {
       alert("Please Login");
     }
@@ -44,7 +43,8 @@ const Home: React.FC = () => {
 
   const handleRemoveFavorite = (movie: Movie) => {
     const updatedFavorites = favorites.filter(fav => fav.imdbID !== movie.imdbID);
-    dispatch(removeFavorite(updatedFavorites));
+    dispatch(removeFavorite(movie));
+    dispatch(saveFavoritesToLocalForage(Validation.username, updatedFavorites));
   };
 
   const filteredData = data.filter(movie =>

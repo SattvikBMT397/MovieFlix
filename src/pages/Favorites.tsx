@@ -1,48 +1,38 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Typography, Grid, Card, CardMedia, CardContent, Button } from '@mui/material';
-import { fetchFavorites, removeFavorite } from '../features/favorites/favoritesSlice';
+import { removeFavorite, setFavorites} from '../features/favorites/favoritesSlice';
+import localforage from 'localforage';
 import { RootState } from '../app/store';
 import { Movie } from '../utils/Interfaces';
-import api from '../utils/api.json'; 
+
 
 function Favorites() {
-  const favorites = useSelector((state: RootState) => state.favorites.favorites);
+  const favorites = useSelector((state:RootState) => state.favorites.favorites);
+  const currentUser = useSelector((state:RootState) => state.user.currentUser);
   const dispatch = useDispatch();
-  const favImdbIDs = favorites?.data?.map((fav) => fav.imdbID) || [];
-  const userId = localStorage.getItem('Id');
-  useEffect(() => {
-    if (userId) {
-      dispatch(fetchFavorites(userId));
-    }
-  }, [ dispatch, userId]);
 
-  const handleRemoveFavorite = async (movie: Movie) => {
-    if (userId) {
-      try {
-      
-        await dispatch(removeFavorite(movie.imdbID));
-        
-      
-        await fetch(`http://localhost:5000/api/favorites/delete`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-          },
-          body: JSON.stringify({ imdbID: movie.imdbID, userId }),
-        });
-        dispatch(fetchFavorites(userId));
-      } catch (error) {
-        console.error('Error removing favorite:', error);
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (currentUser) {
+        const data = await localforage.getItem(`favorites_${currentUser.username}`);
+        console.log(data);  
+        if (data) {
+          dispatch(setFavorites(data));
+        }
       }
+    };
+    fetchFavorites();
+  }, [currentUser, dispatch]);
+
+  const handleRemoveFavorite = async(movie:Movie) => {
+    const updatedFavorites = favorites.filter(fav => fav.imdbID !== movie.imdbID);
+    dispatch(removeFavorite(movie));
+    if (currentUser) {
+    await localforage.setItem(`favorites_${currentUser.username}`, updatedFavorites);
+    dispatch(setFavorites(updatedFavorites));
     }
   };
-
-  // Filter the movies from the JSON file that are in the favorites list
-  const favoriteMovies = api.filter((movie) =>
-    favImdbIDs.includes(movie.imdbID)
-  );
 
   return (
     <Container style={{ marginTop: '20px' }}>
@@ -50,8 +40,8 @@ function Favorites() {
         My Favorite Movies
       </Typography>
       <Grid container spacing={3}>
-        {favoriteMovies.length > 0 ? (
-          favoriteMovies.map((movie, index) => (
+        {favorites && favorites.length > 0 ? (
+          favorites.map((movie, index) => (
             <Grid item xs={12} key={index}>
               <Card elevation={3} style={{ display: 'flex', flexDirection: 'row', minHeight: '250px' }}>
                 <Grid container spacing={2}>
